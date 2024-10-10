@@ -1,0 +1,4 @@
+id: custom_migrate
+label: 'Custom Migrate Group'
+description: 'Migration group for importing companies and users from the API.'
+source_type: url

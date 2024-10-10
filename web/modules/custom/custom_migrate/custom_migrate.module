@@ -1,0 +1,52 @@
+<?php
+use Drupal\node\Entity\Node;
+use Drupal\user\Entity\User;
+use GuzzleHttp\Client;
+
+/**
+ * Implements hook_cron().
+ * This function will be triggered during cron runs.
+ */
+function company_user_import_cron() {
+  $client = new Client();
+  $response = $client->get('https://jsonplaceholder.typicode.com/users');
+  $data = json_decode($response->getBody(), TRUE);
+
+  foreach ($data as $userData) {
+    // Create or find the company node.
+    $company_name = $userData['company']['name'];
+    $company_query = \Drupal::entityQuery('node')
+      ->condition('type', 'company')
+      ->condition('title', $company_name);
+    $company_nid = $company_query->execute();
+
+    if (empty($company_nid)) {
+      // Create a new company node.
+      $company_node = Node::create([
+        'type' => 'company',
+        'field_name' => $company_name,
+        'field_catchphrase' => $userData['company']['catchPhrase'],
+        'field_bs' => $userData['company']['bs'],
+      ]);
+      $company_node->save();
+      $company_nid = $company_node->id();
+    } else {
+      $company_nid = reset($company_nid);
+    }
+
+    // Create or find the user.
+    $user = user_load_by_mail($userData['email']);
+    if (!$user) {
+      $user = User::create([
+        'name' => $userData['username'],
+        'mail' => $userData['email'],
+        'status' => 1,
+        'field_name' => $userData['name'],
+        'field_phone' => $userData['phone'],
+        'field_website' => $userData['website'],
+        'field_company' => $company_nid, // Reference to company node.
+      ]);
+      $user->save();
+    }
+  }
+}

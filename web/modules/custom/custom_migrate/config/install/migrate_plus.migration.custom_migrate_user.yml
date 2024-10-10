@@ -1,0 +1,37 @@
+id: custom_migrate_user
+label: 'Migrate Users from API'
+migration_group: custom_migrate
+source:
+  plugin: url
+  data_fetcher_plugin: http
+  data_parser_plugin: json
+  urls: https://jsonplaceholder.typicode.com/users
+  item_selector: '[*]'
+  fields:
+    - id: id
+    - name: name
+    - username: username
+    - email: email
+    - phone: phone
+    - website: website
+    - company: company.name
+ids:
+  id:
+    type: integer
+process:
+  name: username
+  mail: email
+  field_phone: phone
+  field_website:
+    plugin: 'url'
+    source: website
+  field_company:
+    plugin: entity_lookup
+    source: company.name
+    entity_type: node
+    bundle: company
+destination:
+  plugin: entity:user
+migration_dependencies:
+  required:
+    - custom_migrate_company

@@ -1,0 +1,25 @@
+id: custom_migrate_company
+label: 'Migrate Companies from API'
+migration_group: custom_migrate
+source:
+  plugin: url
+  data_fetcher_plugin: http
+  data_parser_plugin: json
+  urls: https://jsonplaceholder.typicode.com/users
+  item_selector: '[*]'
+  fields:
+    - name: company.name
+    - catchPhrase: company.catchPhrase
+    - bs: company.bs
+  ids:
+    name:
+      type: string
+process:
+  type: 'company'
+  title: company.name
+  field_catchphrase: company.catchPhrase
+  field_bs: company.bs
+destination:
+  plugin: 'entity:node'
+  default_bundle: 'company'
+migration_dependencies: null

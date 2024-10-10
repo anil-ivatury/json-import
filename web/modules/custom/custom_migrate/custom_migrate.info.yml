@@ -1,0 +1,9 @@
+name: 'Custom Migrate'
+type: module
+description: 'Migrate users and companies from a JSON API into Drupal nodes and users.'
+core_version_requirement: ^10
+package: Custom
+dependencies:
+  - drupal:migrate
+  - drupal:migrate_plus
+  - drupal:migrate_tools
